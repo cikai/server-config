@@ -1,4 +1,4 @@
-##服务器环境配置文档
+##环境配置
 
 ###1.Ruby
 
@@ -17,6 +17,8 @@
 #####1.2 修改RVM下载源为Ruby China的镜像
 
 	echo "ruby_url=https://cache.ruby-china.org/pub/ruby" > ~/.rvm/user/db
+	或者
+	sed -i 's!ftp.ruby-lang.org/pub/ruby!cache.ruby-china.org/pub/ruby/!' $rvm_path/config/db
 
 #####1.3 用RVM安装Ruby环境
 
@@ -35,9 +37,13 @@
 	gem sources -a https://gems.ruby-china.org/
 	gem sources -l [请确保只有Ruby China的源地址]
 
+#####1.6 更新gem版本
+
+	gem update --system 
+
 ###2.Rails
 
-	gem install rails –v5.0.0.rc1
+	gem install rails -v=5.0.0.rc1
 
 版本号根据自己的需求填写，不写版本会默认更新为当前稳定版。
 
@@ -47,7 +53,13 @@
 
 ###3.Bundler
 
+#####3.1 安装
+
 	gem install bundler
+
+#####3.2 修改bundler下载源为Ruby China的镜像
+
+	bundle config mirror.https://rubygems.org https://gems.ruby-china.org
 
 ###4.PostgreSQL
 
@@ -95,3 +107,73 @@
 
 如果不希望允许所有IP访问，可以将0.0.0.0设置为特定的IP地址。
 
+#####4.5 管理工具pgAdmin III
+
+[https://www.pgadmin.org/](https://www.pgadmin.org/)
+
+###5.Nginx
+
+#####5.1 安装
+
+	sudo apt-get install nginx
+
+#####5.2 nginx配置
+
+编辑nginx配置文件，位置： /etc/nginx/nginx.conf
+
+	worker_processes  4;
+
+	error_log  /var/log/nginx/error.log warn;
+	pid        /var/run/nginx.pid;
+
+	events {
+		worker_connections  1024;
+	}
+
+	http {
+		include       /etc/nginx/mime.types;
+		default_type  application/octet-stream;
+
+		log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+							'$status $body_bytes_sent "$http_referer" '
+							'"$http_user_agent" "$http_x_forwarded_for"';
+
+		access_log  /var/log/nginx/access.log  main;
+
+		sendfile        on;
+		#tcp_nopush     on;
+
+		keepalive_timeout  65;
+
+		#gzip  on;
+
+		#include /etc/nginx/conf.d/*.conf;
+		upstream deploy {
+			server 127.0.0.1:8080;
+		}
+
+		server {
+			listen 80;
+			server_name your_server_ip; # change to match your URL
+			root /var/www/your_project; # I assume your app is located at this location
+
+			location / {
+				# match the name of upstream directive which is defined above
+				proxy_pass http://127.0.0.1:8080;
+				proxy_set_header Host $host;
+				proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+			}
+
+			location ~* ^/assets/ {
+				# Per RFC2616 - 1 year maximum expiry
+				expires 1y;
+				add_header Cache-Control public;
+				# Some browsers still send conditional-GET requests if there's a
+				# Last-Modified header or an ETag header even if they haven't
+				# reached the expiry date sent in the Expires header.
+				add_header Last-Modified "";
+				add_header ETag "";
+				break;
+			}
+		}
+	}
