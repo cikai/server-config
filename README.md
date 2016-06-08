@@ -181,3 +181,20 @@
 			}
 		}
 	}
+
+###7.Rails部署相关问题
+
+#####7.1解决ssh断开后，rails服务器停止问题
+
+1）启动服务
+
+	nohup rails server
+
+2）停止服务
+
+	# 找出进程ID（PID）
+	lsof -wni tcp:3000
+
+	# 将进程kill掉
+	kill -9 <PID>
+
