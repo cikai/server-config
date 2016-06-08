@@ -51,28 +51,32 @@
 
 	rails -v
 
-###3.Bundler
+###3.Nodejs
+	sudo apt-get install nodejs
 
-#####3.1 安装
 
-	gem install bundler
-
-#####3.2 修改bundler下载源为Ruby China的镜像
-
-	bundle config mirror.https://rubygems.org https://gems.ruby-china.org
-
-###4.PostgreSQL
+###4.Bundler
 
 #####4.1 安装
 
+	gem install bundler
+
+#####4.2 修改bundler下载源为Ruby China的镜像
+
+	bundle config mirror.https://rubygems.org https://gems.ruby-china.org
+
+###5.PostgreSQL
+
+#####5.1 安装
+
 	sudo apt-get install postgresql
 
-#####4.2 启动与停止
+#####5.2 启动与停止
 
 	sudo /etc/init.d/postgresql start  # 启动
 	sudo /etc/init.d/postgresql stop   # 停止
 
-#####4.3 设置postgres用户密码
+#####5.3 设置postgres用户密码
 
 以postgres这个系统用户的身份运行psql命令
 
@@ -82,7 +86,7 @@
 
 	ALTER USER postgres WITH PASSWORD 'root'; # 请替换密码root
 
-#####4.4 配置PostgreSQL远程访问
+#####5.4 配置PostgreSQL远程访问
 
 允许远程访问，需要修改两个配置文件。
 
@@ -107,17 +111,17 @@
 
 如果不希望允许所有IP访问，可以将0.0.0.0设置为特定的IP地址。
 
-#####4.5 管理工具pgAdmin III
+#####5.5 管理工具pgAdmin III
 
 [https://www.pgadmin.org/](https://www.pgadmin.org/)
 
-###5.Nginx
+###6.Nginx
 
-#####5.1 安装
+#####6.1 安装
 
 	sudo apt-get install nginx
 
-#####5.2 nginx配置
+#####6.2 nginx配置
 
 编辑nginx配置文件，位置： /etc/nginx/nginx.conf
 
